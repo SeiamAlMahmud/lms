@@ -1,15 +1,11 @@
-* {
-  box-sizing: border-box;
-}
+@import "tailwindcss";
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, Helvetica, sans-serif;
+:root {
+  color-scheme: light;
 }
 
 body {
-  background: #f5f7fb;
-  color: #111827;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  color: #0f172a;
 }
