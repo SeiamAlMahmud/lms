@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const client_1 = require("@prisma/client");
+const auth_1 = require("../../shared/middleware/auth");
+const validateRequest_1 = require("../../shared/middleware/validateRequest");
+const system_controller_1 = require("./system.controller");
+const system_dto_1 = require("./system.dto");
+const router = (0, express_1.Router)();
+router.use(auth_1.authenticate, (0, auth_1.authorize)(client_1.UserRole.SUPER_ADMIN));
+router.get("/settings", system_controller_1.systemController.list);
+router.put("/settings", (0, validateRequest_1.validateRequest)(system_dto_1.upsertSettingSchema), system_controller_1.systemController.upsert);
+exports.default = router;

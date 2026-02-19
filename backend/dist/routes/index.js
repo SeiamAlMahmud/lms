@@ -1,0 +1,26 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_routes_1 = __importDefault(require("../modules/auth/auth.routes"));
+const user_routes_1 = __importDefault(require("../modules/users/user.routes"));
+const category_routes_1 = __importDefault(require("../modules/categories/category.routes"));
+const course_routes_1 = __importDefault(require("../modules/courses/course.routes"));
+const lesson_routes_1 = __importDefault(require("../modules/lessons/lesson.routes"));
+const enrollment_routes_1 = __importDefault(require("../modules/enrollments/enrollment.routes"));
+const progress_routes_1 = __importDefault(require("../modules/progress/progress.routes"));
+const analytics_routes_1 = __importDefault(require("../modules/analytics/analytics.routes"));
+const system_routes_1 = __importDefault(require("../modules/system/system.routes"));
+const router = (0, express_1.Router)();
+router.use("/auth", auth_routes_1.default);
+router.use("/users", user_routes_1.default);
+router.use("/categories", category_routes_1.default);
+router.use("/courses", course_routes_1.default);
+router.use("/lessons", lesson_routes_1.default);
+router.use("/enrollments", enrollment_routes_1.default);
+router.use("/progress", progress_routes_1.default);
+router.use("/analytics", analytics_routes_1.default);
+router.use("/system", system_routes_1.default);
+exports.default = router;

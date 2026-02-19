@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const client_1 = require("@prisma/client");
+const auth_1 = require("../../shared/middleware/auth");
+const validateRequest_1 = require("../../shared/middleware/validateRequest");
+const category_controller_1 = require("./category.controller");
+const category_dto_1 = require("./category.dto");
+const router = (0, express_1.Router)();
+router.get("/", (0, validateRequest_1.validateRequest)(category_dto_1.listCategorySchema), category_controller_1.categoryController.list);
+router.post("/", auth_1.authenticate, (0, auth_1.authorize)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), (0, validateRequest_1.validateRequest)(category_dto_1.createCategorySchema), category_controller_1.categoryController.create);
+router.patch("/:id", auth_1.authenticate, (0, auth_1.authorize)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN), (0, validateRequest_1.validateRequest)(category_dto_1.updateCategorySchema), category_controller_1.categoryController.update);
+exports.default = router;

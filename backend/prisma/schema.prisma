@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  INSTRUCTOR
+  STUDENT
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  DROPPED
+}
+
+enum LessonType {
+  VIDEO
+  TEXT
+}
+
+model User {
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  fullName         String
+  email            String          @unique
+  passwordHash     String
+  role             UserRole        @default(STUDENT)
+  status           UserStatus      @default(ACTIVE)
+  refreshTokenHash String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  courses      Course[]         @relation("InstructorCourses")
+  enrollments  Enrollment[]
+  lessonPoints LessonProgress[]
+  settings     PlatformSetting[]
+
+  @@index([role, status])
+}
+
+model Category {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  slug      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  courses Course[]
+
+  @@unique([name])
+}
+
+model Course {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  description  String?
+  thumbnailUrl String?
+  status       CourseStatus @default(DRAFT)
+  isFree       Boolean      @default(true)
+  price        Float        @default(0)
+  isDeleted    Boolean      @default(false)
+  deletedAt    DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  instructorId String    @db.ObjectId
+  instructor   User      @relation("InstructorCourses", fields: [instructorId], references: [id])
+  categoryId   String?   @db.ObjectId
+  category     Category? @relation(fields: [categoryId], references: [id])
+
+  lessons     Lesson[]
+  enrollments Enrollment[]
+
+  @@index([instructorId, status])
+  @@index([categoryId, status])
+  @@index([isDeleted, status, createdAt])
+  @@index([title])
+}
+
+model Lesson {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String?
+  videoUrl  String?
+  type      LessonType
+  order     Int
+  isPreview Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  courseId String @db.ObjectId
+  course   Course @relation(fields: [courseId], references: [id])
+
+  progress LessonProgress[]
+
+  @@unique([courseId, order])
+}
+
+model Enrollment {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  status      EnrollmentStatus @default(ACTIVE)
+  paidAmount  Float            @default(0)
+  enrolledAt  DateTime         @default(now())
+  completedAt DateTime?
+  droppedAt   DateTime?
+  updatedAt   DateTime         @updatedAt
+
+  studentId String @db.ObjectId
+  student   User   @relation(fields: [studentId], references: [id])
+  courseId  String @db.ObjectId
+  course    Course @relation(fields: [courseId], references: [id])
+
+  @@unique([studentId, courseId])
+  @@index([courseId, status])
+  @@index([studentId, status])
+  @@index([enrolledAt])
+}
+
+model LessonProgress {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  isCompleted Boolean  @default(false)
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  studentId String @db.ObjectId
+  student   User   @relation(fields: [studentId], references: [id])
+  lessonId  String @db.ObjectId
+  lesson    Lesson @relation(fields: [lessonId], references: [id])
+
+  @@unique([studentId, lessonId])
+  @@index([lessonId, isCompleted])
+}
+
+model PlatformSetting {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  updatedById String @db.ObjectId
+  updatedBy   User   @relation(fields: [updatedById], references: [id])
+}

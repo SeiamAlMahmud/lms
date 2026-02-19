@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const client_1 = require("@prisma/client");
+const auth_1 = require("../../shared/middleware/auth");
+const validateRequest_1 = require("../../shared/middleware/validateRequest");
+const enrollment_controller_1 = require("./enrollment.controller");
+const enrollment_dto_1 = require("./enrollment.dto");
+const router = (0, express_1.Router)();
+router.use(auth_1.authenticate);
+router.post("/", (0, auth_1.authorize)(client_1.UserRole.STUDENT, client_1.UserRole.SUPER_ADMIN), (0, auth_1.forbidRoles)(client_1.UserRole.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(enrollment_dto_1.enrollSchema), enrollment_controller_1.enrollmentController.enroll);
+router.patch("/:enrollmentId/status", (0, auth_1.authorize)(client_1.UserRole.STUDENT), (0, validateRequest_1.validateRequest)(enrollment_dto_1.updateEnrollmentStatusSchema), enrollment_controller_1.enrollmentController.updateStatus);
+router.get("/me", (0, auth_1.authorize)(client_1.UserRole.STUDENT), (0, validateRequest_1.validateRequest)(enrollment_dto_1.listEnrollmentSchema), enrollment_controller_1.enrollmentController.listMine);
+router.get("/course/:courseId", (0, auth_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.SUPER_ADMIN, client_1.UserRole.INSTRUCTOR), (0, validateRequest_1.validateRequest)(enrollment_dto_1.courseEnrollmentParamSchema), enrollment_controller_1.enrollmentController.listByCourse);
+exports.default = router;

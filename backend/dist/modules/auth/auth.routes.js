@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_1 = require("../../shared/middleware/auth");
+const rateLimit_1 = require("../../shared/middleware/rateLimit");
+const validateRequest_1 = require("../../shared/middleware/validateRequest");
+const auth_controller_1 = require("./auth.controller");
+const auth_dto_1 = require("./auth.dto");
+const router = (0, express_1.Router)();
+router.post("/bootstrap-super-admin", rateLimit_1.authRateLimiter, (0, validateRequest_1.validateRequest)(auth_dto_1.bootstrapSuperAdminSchema), auth_controller_1.authController.bootstrapSuperAdmin);
+router.post("/register", rateLimit_1.authRateLimiter, (0, validateRequest_1.validateRequest)(auth_dto_1.registerSchema), auth_controller_1.authController.register);
+router.post("/login", rateLimit_1.authRateLimiter, (0, validateRequest_1.validateRequest)(auth_dto_1.loginSchema), auth_controller_1.authController.login);
+router.post("/refresh", rateLimit_1.authRateLimiter, (0, validateRequest_1.validateRequest)(auth_dto_1.refreshSchema), auth_controller_1.authController.refresh);
+router.post("/logout", auth_1.authenticate, auth_controller_1.authController.logout);
+exports.default = router;

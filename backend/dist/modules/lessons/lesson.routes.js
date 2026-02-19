@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const client_1 = require("@prisma/client");
+const auth_1 = require("../../shared/middleware/auth");
+const validateRequest_1 = require("../../shared/middleware/validateRequest");
+const lesson_controller_1 = require("./lesson.controller");
+const lesson_dto_1 = require("./lesson.dto");
+const router = (0, express_1.Router)();
+router.get("/course/:courseId", (0, validateRequest_1.validateRequest)(lesson_dto_1.lessonCourseParamSchema), lesson_controller_1.lessonController.listByCourse);
+router.post("/course/:courseId", auth_1.authenticate, (0, auth_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.INSTRUCTOR, client_1.UserRole.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(lesson_dto_1.createLessonSchema), lesson_controller_1.lessonController.create);
+router.patch("/:lessonId", auth_1.authenticate, (0, auth_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.INSTRUCTOR, client_1.UserRole.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(lesson_dto_1.updateLessonSchema), lesson_controller_1.lessonController.update);
+router.delete("/:lessonId", auth_1.authenticate, (0, auth_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.INSTRUCTOR, client_1.UserRole.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(lesson_dto_1.lessonIdParamSchema), lesson_controller_1.lessonController.remove);
+exports.default = router;

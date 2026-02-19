@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const client_1 = require("@prisma/client");
+const auth_1 = require("../../shared/middleware/auth");
+const validateRequest_1 = require("../../shared/middleware/validateRequest");
+const progress_controller_1 = require("./progress.controller");
+const progress_dto_1 = require("./progress.dto");
+const router = (0, express_1.Router)();
+router.use(auth_1.authenticate, (0, auth_1.authorize)(client_1.UserRole.STUDENT));
+router.post("/lessons/:lessonId/complete", (0, validateRequest_1.validateRequest)(progress_dto_1.completeLessonSchema), progress_controller_1.progressController.completeLesson);
+router.get("/courses/:courseId", (0, validateRequest_1.validateRequest)(progress_dto_1.courseProgressSchema), progress_controller_1.progressController.getCourseProgress);
+exports.default = router;

@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const client_1 = require("@prisma/client");
+const auth_1 = require("../../shared/middleware/auth");
+const ownership_1 = require("../../shared/middleware/ownership");
+const validateRequest_1 = require("../../shared/middleware/validateRequest");
+const course_controller_1 = require("./course.controller");
+const course_dto_1 = require("./course.dto");
+const router = (0, express_1.Router)();
+router.get("/", (0, validateRequest_1.validateRequest)(course_dto_1.listCourseSchema), course_controller_1.courseController.list);
+router.get("/:id", (0, validateRequest_1.validateRequest)(course_dto_1.courseIdParamSchema), course_controller_1.courseController.getById);
+router.post("/", auth_1.authenticate, (0, auth_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.INSTRUCTOR, client_1.UserRole.SUPER_ADMIN), (0, auth_1.forbidRoles)(client_1.UserRole.SUPER_ADMIN), (0, validateRequest_1.validateRequest)(course_dto_1.createCourseSchema), course_controller_1.courseController.create);
+router.patch("/:id", auth_1.authenticate, (0, auth_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.INSTRUCTOR, client_1.UserRole.SUPER_ADMIN), ownership_1.requireCourseOwnership, (0, validateRequest_1.validateRequest)(course_dto_1.updateCourseSchema), course_controller_1.courseController.update);
+router.patch("/:id/status", auth_1.authenticate, (0, auth_1.authorize)(client_1.UserRole.SUPER_ADMIN, client_1.UserRole.ADMIN, client_1.UserRole.INSTRUCTOR), ownership_1.requireCourseOwnership, (0, validateRequest_1.validateRequest)(course_dto_1.updateCourseStatusSchema), course_controller_1.courseController.updateStatus);
+router.delete("/:id", auth_1.authenticate, (0, auth_1.authorize)(client_1.UserRole.ADMIN, client_1.UserRole.INSTRUCTOR, client_1.UserRole.SUPER_ADMIN), ownership_1.requireCourseOwnership, (0, validateRequest_1.validateRequest)(course_dto_1.courseIdParamSchema), course_controller_1.courseController.remove);
+exports.default = router;
