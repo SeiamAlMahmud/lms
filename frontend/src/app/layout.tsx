@@ -1,19 +1,23 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import "./globals.css";
+import { AppProviders } from "@/providers/AppProviders";
+import { Topbar } from "@/components/layout/Topbar";
 
 export const metadata: Metadata = {
-  title: "LMS Frontend",
-  description: "Next.js + TypeScript frontend",
+  title: "LMS Platform",
+  description: "Production-ready LMS frontend",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AppProviders>
+          <Topbar />
+          {children}
+        </AppProviders>
+      </body>
     </html>
   );
 }
